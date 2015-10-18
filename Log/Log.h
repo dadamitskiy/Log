@@ -2,10 +2,10 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
-#include <Windows.h>
 #include <string>
+#include <stdarg.h>
 
-#define LOG(VerbosityLevel, Msg) \
+#define LOG_LEGACY(VerbosityLevel, Msg) \
 	Log::GetInstance()->SetTextColorToVerbosityLevel(Verbosity::##VerbosityLevel); \
 	Log::GetInstance()->Print(Msg);
 
@@ -13,6 +13,11 @@
 	Log::GetInstance()->SetTextColorToVerbosityLevel(Verbosity::##VerbosityLevel); \
 	Log::GetInstance()->PrintTimeStamp(); \
 	Log::GetInstance()->Print(Msg);
+
+#define LOG(Category, VerbosityLevel, bAddTimestamp, Format, ...) \
+	Log::GetInstance()->SetTextColorToVerbosityLevel(Verbosity::##VerbosityLevel); \
+	if (bAddTimestamp) { Log::GetInstance()->PrintTimeStamp(); } \
+	Log::GetInstance()->Print(Format, __VA_ARGS__);
 
 namespace Verbosity
 {
@@ -37,9 +42,10 @@ public:
 
 
 
-	// ...
+	// ... To REMOVE ...
 	void Print(std::string szMessage);
-
+	// Final Print
+	void Print(const char* Format, ...);
 
 
 	/* Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */

@@ -2,6 +2,7 @@
 #include "Log.h"
 #include <cstdio>
 #include <ctime>
+#include <Windows.h>
 
 Log* Log::GetInstance()
 {
@@ -12,6 +13,15 @@ Log* Log::GetInstance()
 void Log::Print(std::string szMessage)
 {
 	printf(szMessage.c_str());
+}
+
+void Log::Print(const char* Format, ...)
+{
+	va_list ap;
+	va_start(ap, Format);
+	vprintf(Format, ap);
+	va_end(ap);
+	printf("\n");
 }
 
 void Log::PrintTimeStamp()
