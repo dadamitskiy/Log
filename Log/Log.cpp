@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <ctime>
 #include <Windows.h>
+#include <direct.h>
+#include <fstream>
 
 Log* Log::GetInstance()
 {
@@ -10,18 +12,116 @@ Log* Log::GetInstance()
 	return &log;
 }
 
-void Log::Print(std::string szMessage)
+void Log::Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...)
 {
-	printf(szMessage.c_str());
-}
+	if (OutMethod == OutputMethod::ConsoleWindow || OutMethod == OutputMethod::All)
+	{
+		SetTextColorToVerbosityLevel(VerbosityLevel);
 
-void Log::Print(const char* Format, ...)
-{
-	va_list ap;
-	va_start(ap, Format);
-	vprintf(Format, ap);
-	va_end(ap);
-	printf("\n");
+		if (Detail == DetailLevel::High)
+		{
+			PrintTimeStamp();
+			printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+		}
+		else if (Detail == DetailLevel::Medium)
+		{
+			printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+		}
+
+		va_list ap;
+		va_start(ap, Format);
+		vprintf(Format, ap);
+		va_end(ap);
+		printf("\n");
+	}
+
+	if (OutMethod == OutputMethod::OutputWindow || OutMethod == OutputMethod::All)
+	{
+		//if (Detail == DetailLevel::High)
+		//{
+		//	OutputTimeStamp();
+		//	
+		//	char buffer[256];
+		//	va_list args;
+		//	va_start(args, buffer);
+		//	
+		//	//vsnprintf_s(buffer, _countof(buffer), _TRUNCATE, Format, args);
+		//	va_end(args);
+		//	printf(buffer);
+		//}
+		//else if (Detail == DetailLevel::Medium)
+		//{
+		//	
+		//}
+		//else
+		//{
+		//	// Do nothing extra for low detail.
+		//}
+	}
+	
+	if (OutMethod == OutputMethod::TextFile || OutMethod == OutputMethod::All)
+	{
+		// If an OutputLogs folder does not exist, create one.
+		DWORD filetype = GetFileAttributes(L"OutputLogs");
+		if (filetype == INVALID_FILE_ATTRIBUTES && (filetype & FILE_ATTRIBUTE_DIRECTORY))
+		{
+			_mkdir("OutputLogs");
+		}
+
+		std::string filename = "OutputLogs/";
+		filename += LogCategory;
+		filename += ".txt";
+		
+		char streamBuffer[512];
+		va_list args;
+		va_start(args, Format);
+		vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, args);
+		va_end(args);
+
+		std::ofstream fout;
+		fout.open(filename.c_str(), std::ios_base::out | std::ios_base::app);
+		if (fout.is_open())
+		{
+			if (Detail == DetailLevel::High)
+			{
+				time_t now = time(0);
+				tm timeInfo;
+				localtime_s(&timeInfo, &now);
+				char timeStampBuffer[36];
+				sprintf_s(timeStampBuffer,"[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
+				fout << timeStampBuffer;
+				char detailBuffer[64];
+				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+				fout << detailBuffer;
+			}
+			else if (Detail == DetailLevel::Medium)
+			{
+				char detailBuffer[64];
+				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+				fout << detailBuffer;
+			}
+
+			if (VerbosityLevel == Verbosity::Default)
+			{
+				fout << "DEFAULT: ";
+			}
+			else if (VerbosityLevel == Verbosity::Debug)
+			{
+				fout << "DEBUG: ";
+			}
+			else if (VerbosityLevel == Verbosity::Warning)
+			{
+				fout << "WARNING: ";
+			}
+			else if (VerbosityLevel == Verbosity::Error)
+			{
+				fout << "ERROR: ";
+			}
+
+			fout << streamBuffer << std::endl;
+			fout.close();
+		}
+	}
 }
 
 void Log::PrintTimeStamp()

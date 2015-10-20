@@ -1,12 +1,18 @@
 
 #include "Log.h"
+#include <Windows.h>
+#include <string>
+
+#include <iostream>
+#include <fstream>
 
 // @TODO: Write in code for non-unicode stuff.
 
 /*
  * Create categories that can then be dumped to individual txt files?
  * Also config setup to allow for output only, console only, text file.
- * Turn Log singleton into namespace?
+ * Turn Log singleton into namespace? Singleton not really thread safe by default.
+ * Add file number and line __LINE__, __FUNC__, etc...
  */
 
 // @TODO: Remove VLD. Only here for testing.
@@ -16,27 +22,26 @@
 
 int main()
 {
-	Log::GetInstance()->ResetTextColor();
-
-	LOG_LEGACY(Error, "Testing an error level message\n");
-	LOG_LEGACY(Default, "Back to default.\n");
-	LOG_LEGACY(Warning, "This is a warning.\n");
-	LOG_LEGACY(Debug, "Debug this thing.\n");
-	LOG_LEGACY(Default, "Back to default.\n");
-
-	LOG_DETAILED(Warning, "Test Detailed message.\n");
-	
 	Log::GetInstance()->OutputTimeStamp();
-//	OutputDebugStringW(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ\n");
+
+	//LOG(Test01, Debug, OutputWindow, High, "Test %d %d %d %d sadfj", 32, 23, 546, 65);
+	//LOG(Test01, Default, OutputWindow, High, "Test %s sadfj", "ONE");
+
+	LOG(Test01, Debug, ConsoleWindow, High, "Test %d %d %d %d sadfj", 32, 23, 546, 65);
+	LOG(dfg, Error, ConsoleWindow, Medium, "Testing an error level message");
+	LOG(sfd, Default, ConsoleWindow, Low, "Back to default.");
+
+	LOG(asdf, Warning, ConsoleWindow, Low, "This is a warning.");
+	LOG(afsdf, Debug, ConsoleWindow, Low, "Debug this thing.");
+
+	LOG(SomeCategory, Debug, ConsoleWindow, Low, "Test %d thing.", 512);
+	LOG(OtherCategory, Error, ConsoleWindow, High, "Blah blah blah");
 
 
-
-	// New Log testing.
-	LOG(SomeCategory, Debug, false, "Test %d thing.", 512);
-	LOG(OtherCategory, Error, true, "Blah blah blah");
-
-
-
+	LOG(NonCategory, Debug, TextFile, High, "Test thing string stuff %d.", 35);
+	LOG(NonCategory, Warning, TextFile, Medium, "Test thing string stuff %s.", "blah");
+	LOG(NonCategory, Error, TextFile, Low, "Test thing string stuff.");
+	LOG(NonCategory, Default, TextFile, Low, "Test thing string stuff.");
 
 	Log::GetInstance()->ResetTextColor();
 
