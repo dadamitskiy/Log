@@ -28,6 +28,25 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 			printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 		}
 
+		printf("Log%s ", LogCategory);
+
+		if (VerbosityLevel == Verbosity::Default)
+		{
+			printf("DEFAULT: ");
+		}
+		else if (VerbosityLevel == Verbosity::Debug)
+		{
+			printf("DEBUG: ");
+		}
+		else if (VerbosityLevel == Verbosity::Warning)
+		{
+			printf("WARNING: ");
+		}
+		else if (VerbosityLevel == Verbosity::Error)
+		{
+			printf("ERROR: ");
+		}
+
 		va_list ap;
 		va_start(ap, Format);
 		vprintf(Format, ap);
@@ -37,26 +56,63 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 
 	if (OutMethod == OutputMethod::OutputWindow || OutMethod == OutputMethod::All)
 	{
-		//if (Detail == DetailLevel::High)
-		//{
-		//	OutputTimeStamp();
-		//	
-		//	char buffer[256];
-		//	va_list args;
-		//	va_start(args, buffer);
-		//	
-		//	//vsnprintf_s(buffer, _countof(buffer), _TRUNCATE, Format, args);
-		//	va_end(args);
-		//	printf(buffer);
-		//}
-		//else if (Detail == DetailLevel::Medium)
-		//{
-		//	
-		//}
-		//else
-		//{
-		//	// Do nothing extra for low detail.
-		//}
+		if (Detail == DetailLevel::High)
+		{
+			OutputTimeStamp();
+			char detailBuffer[64];
+			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+
+			size_t convertedChars = 0;
+			wchar_t wc[64];
+			mbstowcs_s(&convertedChars, wc, detailBuffer, _TRUNCATE);
+			OutputDebugStringW(wc);
+		}
+		else if (Detail == DetailLevel::Medium)
+		{
+			char detailBuffer[64];
+			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+
+			size_t convertedChars = 0;
+			wchar_t wc[64];
+			mbstowcs_s(&convertedChars, wc, detailBuffer, _TRUNCATE);
+			OutputDebugStringW(wc);
+		}
+
+		char outputCategory[64];
+		sprintf_s(outputCategory, "Log%s ", LogCategory);
+		size_t convChars = 0;
+		wchar_t wOutputCategory[64];
+		mbstowcs_s(&convChars, wOutputCategory, outputCategory, _TRUNCATE);
+		OutputDebugStringW(wOutputCategory);
+
+		if (VerbosityLevel == Verbosity::Default)
+		{
+			OutputDebugStringW(L"DEFAULT: ");
+		}
+		else if (VerbosityLevel == Verbosity::Debug)
+		{
+			OutputDebugStringW(L"DEBUG: ");
+		}
+		else if (VerbosityLevel == Verbosity::Warning)
+		{
+			OutputDebugStringW(L"WARNING: ");
+		}
+		else if (VerbosityLevel == Verbosity::Error)
+		{
+			OutputDebugStringW(L"ERROR: ");
+		}
+
+		char streamBuffer[512];
+		va_list args;
+		va_start(args, Format);
+		vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, args);
+		va_end(args);
+
+		size_t convertedChars = 0;
+		wchar_t wc[512];
+		mbstowcs_s(&convertedChars, wc, streamBuffer, _TRUNCATE);
+		OutputDebugStringW(wc);
+		OutputDebugStringW(L"\n");
 	}
 	
 	if (OutMethod == OutputMethod::TextFile || OutMethod == OutputMethod::All)
@@ -129,7 +185,6 @@ void Log::PrintTimeStamp()
 	time_t now = time(0);
 	tm timeInfo;
 	localtime_s(&timeInfo, &now);
-	
 	printf("[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
 }
 
@@ -138,18 +193,13 @@ void Log::OutputTimeStamp()
 	time_t now = time(0);
 	tm timeInfo;
 	localtime_s(&timeInfo, &now);
-
 	char szBuffer[23];
 	sprintf_s(szBuffer, "[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
 
-#if UNICODE
 	size_t convertedChars = 0;
 	wchar_t wc[23];
 	mbstowcs_s(&convertedChars, wc, szBuffer, _TRUNCATE);
 	OutputDebugStringW(wc);
-#else
-	// @TODO
-#endif
 }
 
 void Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)

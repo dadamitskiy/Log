@@ -51,8 +51,7 @@ public:
 	/* Singleton implementation. */
 	static Log* GetInstance();
 
-
-	/*  */
+	/* Print the desired message to the desired location in the desired detail. */
 	void Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...);
 
 	/* Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */
@@ -70,8 +69,6 @@ private:
 
 	Log() = default;
 	~Log() = default;
-
-
 };
 
 #endif
