@@ -25,35 +25,31 @@
 #include "Log.h"
 #include <Windows.h>
 
-// @TODO: Write in code for non-unicode stuff.
-// @TODO: Remove VLD. Only here for testing.
-#ifdef _DEBUG
-//#include <vld.h>
-#endif
-
-int main()
+int main(int, const char*[])
 {
-	// Test out loggin to the output window.
-	LOG(TestCat01, Debug, OutputWindow, High, "TestMessage");
-	LOG(TestCat01, Debug, OutputWindow, Low, "TestMessage %d", 2);
-	LOG(TestCat01, Debug, OutputWindow, Medium, "TestMessage %s", "Three");
+	// Test out logging to the output window.
+	LOG(OutWin, Debug, OutputWindow, High, "Test Message for the output window.");
+	LOG(OutWin, Error, OutputWindow, Medium, "Output %s message to the output window.", "this");
+	LOG(OutWin, Warning, OutputWindow, Low, "This is the %drd message.", 2);
+	LOG(OutWin, Default, OutputWindow, Medium, "Last message to the output window.");
 
 	// Test out logging to a console window.
-	LOG(Test01, Debug, ConsoleWindow, High, "Test %d %d %d %d sadfj", 32, 23, 546, 65);
-	LOG(dfg, Error, ConsoleWindow, Medium, "Testing an error level message");
-	LOG(sfd, Default, ConsoleWindow, Low, "Back to default.");
-	LOG(asdf, Warning, ConsoleWindow, Low, "This is a warning.");
-	LOG(afsdf, Debug, ConsoleWindow, Low, "Debug this thing.");
-	LOG(SomeCategory, Debug, ConsoleWindow, Low, "Test %d thing.", 512);
-	LOG(OtherCategory, Error, ConsoleWindow, High, "Blah blah blah");
+	LOG(ConWinCat, Debug, ConsoleWindow, High, "Let's log some numbers to the console: %d %d %d %d.", 32, 23, 546, 65);
+	LOG(ConWinCat, Error, ConsoleWindow, Medium, "This is a bad error message example.");
+	LOG(ConWinCat, Warning, ConsoleWindow, Low, "Now this would be a possible warning.");
+	LOG(ConWinCat, Default, ConsoleWindow, Low, "Guess we'll just go back to logging %s messages.", "default");
 
 	// Test out logging to a text file.
-	LOG(NonCategory, Debug, TextFile, High, "Test thing string stuff %d.", 35);
-	LOG(NonCategory, Warning, TextFile, Medium, "Test thing string stuff %s.", "blah");
-	LOG(NonCategory, Error, TextFile, Low, "Test thing string stuff.");
-	LOG(NonCategory, Default, TextFile, Low, "Test thing string stuff.");
+	LOG(MyTxtFileCategory, Debug, TextFile, High, "Try logging the number %d to a text file.", 35);
+	LOG(MyTxtFileCategory, Warning, TextFile, Medium, "Yay! I guess %s worked.", "it");
+	LOG(MyTxtFileCategory, Error, TextFile, Medium, "Oh no, some error here.");
+	LOG(MyTxtFileCategory, Default, TextFile, Low, "Some default unimportant message.");
 
-	Log::ResetTextColor();
+	// Test out logging to all output forms.
+	LOG(MyAllCategory, Debug, All, High, "Let's log this message to all %d log outputs.", 3);
+	LOG(MyAllCategory, Warning, All, High, "It must have %s, as this message is on all %d areas.", "worked", 3);
+	LOG(MyAllCategory, Default, All, Medium, "Hey look, I'm just a normal message.");
+	LOG(MyAllCategory, Error, All, Low, "This must be some error.");
 
 	system("PAUSE");
 	return 0;

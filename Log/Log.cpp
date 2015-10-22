@@ -23,11 +23,9 @@
  */
 
 #include "Log.h"
-#include <cstdio>
 #include <ctime>
-#include <Windows.h>
 #include <direct.h>
-#include <fstream>
+#include <Windows.h>
 
 void Log::Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...)
 {
@@ -37,16 +35,21 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 
 		if (Detail == DetailLevel::High)
 		{
-			PrintTimeStamp();
+			PrintTimeStampToConsoleWindow();
+
+			// Print the file, function, and line the LOG statement was called on.
 			printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 		}
 		else if (Detail == DetailLevel::Medium)
 		{
+			// Print the file, function, and line the LOG statement was called on.
 			printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 		}
 
+		// Print out the category.
 		printf("Log%s ", LogCategory);
 
+		// Print out the log calls verbosity level.
 		if (VerbosityLevel == Verbosity::Default)
 		{
 			printf("DEFAULT: ");
@@ -64,6 +67,7 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 			printf("ERROR: ");
 		}
 
+		// Print out the LOG message.
 		va_list ap;
 		va_start(ap, Format);
 		vprintf(Format, ap);
@@ -75,33 +79,33 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 	{
 		if (Detail == DetailLevel::High)
 		{
-			OutputTimeStamp();
+			PrintTimeStampToOutputWindow();
+
+			// Output the file, function, and line the LOG statement was called on.
 			char detailBuffer[64];
 			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-
-			size_t convertedChars = 0;
 			wchar_t wc[64];
-			mbstowcs_s(&convertedChars, wc, detailBuffer, _TRUNCATE);
+			mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
 			OutputDebugStringW(wc);
 		}
 		else if (Detail == DetailLevel::Medium)
 		{
+			// Output the file, function, and line the LOG statement was called on.
 			char detailBuffer[64];
 			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-
-			size_t convertedChars = 0;
 			wchar_t wc[64];
-			mbstowcs_s(&convertedChars, wc, detailBuffer, _TRUNCATE);
+			mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
 			OutputDebugStringW(wc);
 		}
 
+		// Output the log category.
 		char outputCategory[64];
 		sprintf_s(outputCategory, "Log%s ", LogCategory);
-		size_t convChars = 0;
 		wchar_t wOutputCategory[64];
-		mbstowcs_s(&convChars, wOutputCategory, outputCategory, _TRUNCATE);
+		mbstowcs_s(nullptr, wOutputCategory, outputCategory, _TRUNCATE);
 		OutputDebugStringW(wOutputCategory);
 
+		// Output the verbosity level.
 		if (VerbosityLevel == Verbosity::Default)
 		{
 			OutputDebugStringW(L"DEFAULT: ");
@@ -119,15 +123,16 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 			OutputDebugStringW(L"ERROR: ");
 		}
 
+		// Store the LOG message into the streamBuffer array.
 		char streamBuffer[512];
 		va_list args;
 		va_start(args, Format);
 		vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, args);
 		va_end(args);
 
-		size_t convertedChars = 0;
+		// Output the LOG message to the output window.
 		wchar_t wc[512];
-		mbstowcs_s(&convertedChars, wc, streamBuffer, _TRUNCATE);
+		mbstowcs_s(nullptr, wc, streamBuffer, _TRUNCATE);
 		OutputDebugStringW(wc);
 		OutputDebugStringW(L"\n");
 	}
@@ -141,39 +146,41 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 			_mkdir("OutputLogs");
 		}
 
+		// Setup the text file name and path based off of the category name.
 		std::string filename = "OutputLogs/";
 		filename += LogCategory;
 		filename += ".txt";
 		
+		// Store the LOG message into streamBuffer.
 		char streamBuffer[512];
 		va_list args;
 		va_start(args, Format);
 		vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, args);
 		va_end(args);
 
+		// Append the data to a text file.
 		std::ofstream fout;
 		fout.open(filename.c_str(), std::ios_base::out | std::ios_base::app);
 		if (fout.is_open())
 		{
 			if (Detail == DetailLevel::High)
 			{
-				time_t now = time(0);
-				tm timeInfo;
-				localtime_s(&timeInfo, &now);
-				char timeStampBuffer[36];
-				sprintf_s(timeStampBuffer,"[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
-				fout << timeStampBuffer;
+				PrintTimeStampToTextFile(fout);
+				
+				// Print the file, function, and line the LOG statement was called on.
 				char detailBuffer[64];
 				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 				fout << detailBuffer;
 			}
 			else if (Detail == DetailLevel::Medium)
 			{
+				// Print the file, function, and line the LOG statement was called on.
 				char detailBuffer[64];
 				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 				fout << detailBuffer;
 			}
 
+			// Print out the verbosity level.
 			if (VerbosityLevel == Verbosity::Default)
 			{
 				fout << "DEFAULT: ";
@@ -197,7 +204,7 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 	}
 }
 
-void Log::PrintTimeStamp()
+void Log::PrintTimeStampToConsoleWindow()
 {
 	time_t now = time(0);
 	tm timeInfo;
@@ -205,18 +212,26 @@ void Log::PrintTimeStamp()
 	printf("[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
 }
 
-void Log::OutputTimeStamp()
+void Log::PrintTimeStampToOutputWindow()
 {
 	time_t now = time(0);
 	tm timeInfo;
 	localtime_s(&timeInfo, &now);
 	char szBuffer[23];
 	sprintf_s(szBuffer, "[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
-
-	size_t convertedChars = 0;
 	wchar_t wc[23];
-	mbstowcs_s(&convertedChars, wc, szBuffer, _TRUNCATE);
+	mbstowcs_s(nullptr, wc, szBuffer, _TRUNCATE);
 	OutputDebugStringW(wc);
+}
+
+void Log::PrintTimeStampToTextFile(std::ofstream& OutStream)
+{
+	time_t now = time(0);
+	tm timeInfo;
+	localtime_s(&timeInfo, &now);
+	char timeStampBuffer[36];
+	sprintf_s(timeStampBuffer, "[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
+	OutStream << timeStampBuffer;
 }
 
 void Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)
@@ -246,5 +261,6 @@ void Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)
 
 void Log::ResetTextColor()
 {
+	// Set the color to white.
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }

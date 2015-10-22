@@ -28,8 +28,11 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <crtdefs.h>
+#include <fstream>
 
-#define LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__, #Category, Log::Verbosity::##VerbosityLevel, Log::OutputMethod::##OutputType, Log::DetailLevel::##Detail, Format, __VA_ARGS__);
+#define LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
+	#Category, Log::Verbosity::##VerbosityLevel, Log::OutputMethod::##OutputType, Log::DetailLevel::##Detail, Format,\
+	__VA_ARGS__);
 
 /*
  * A namespace containing the functions needed to log information to a console window, text file, or an output 
@@ -76,10 +79,13 @@ namespace Log
 	void Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...);
 
 	/* Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */
-	void PrintTimeStamp();
+	void PrintTimeStampToConsoleWindow();
 
-	/* Output a timestamp to Visual Studio output window. */
-	void OutputTimeStamp();
+	/* Print a timestamp to Visual Studio output window. */
+	void PrintTimeStampToOutputWindow();
+
+	/* Print a timestamp to a text file. */
+	void PrintTimeStampToTextFile(std::ofstream& OutStream);
 
 	/* Set the color of the console window text based on the verbosity level. */
 	void SetTextColorToVerbosityLevel(Verbosity::Type InLevel);
