@@ -10,7 +10,7 @@ Calling LOG() will ask for the following parameters:
   3. OutputType: Either All, ConsoleWindow, OutputWindow, or TextFile. ConsoleWindow will log to a console window, OutputWindow is designed to log to Visual Studio output window, TextFile will log to a text file titled whatever your category name is under a folder called OutputLogs where the vcproj exists, and All will log to all three.
   4. DetailLevel: Either Low, Medium, or High. Low just logs the message, while medium and high provide the file, function, and line the log statement is called. Also, high will add a timestamp.
   5. Format: The message to log.
-  6. __VA_ARGS__: Optional parameter that works very similar to printf in C++. Use the Format parameter and this parameter to fill out the message.
+  6.  __VA_ARGS__ : Optional parameter that works very similar to printf in C++. Use the Format parameter and this parameter to fill out the message.
 
 Example:
 LOG(MyCategory, Error, TextFile, Low, "This is my %s message.", "error");
