@@ -77,6 +77,8 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 
 	if (OutMethod == OutputMethod::OutputWindow || OutMethod == OutputMethod::All)
 	{
+		// Ensure we are using Visual Studio to compile the code if we intend to log to its output window.
+#if defined(_MSC_VER)
 		if (Detail == DetailLevel::High)
 		{
 			PrintTimeStampToOutputWindow();
@@ -135,6 +137,7 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 		mbstowcs_s(nullptr, wc, streamBuffer, _TRUNCATE);
 		OutputDebugStringW(wc);
 		OutputDebugStringW(L"\n");
+#endif
 	}
 	
 	if (OutMethod == OutputMethod::TextFile || OutMethod == OutputMethod::All)
