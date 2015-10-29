@@ -82,18 +82,18 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 			PrintTimeStampToOutputWindow();
 
 			// Output the file, function, and line the LOG statement was called on.
-			char detailBuffer[64];
+			char detailBuffer[128];
 			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-			wchar_t wc[64];
+			wchar_t wc[128];
 			mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
 			OutputDebugStringW(wc);
 		}
 		else if (Detail == DetailLevel::Medium)
 		{
 			// Output the file, function, and line the LOG statement was called on.
-			char detailBuffer[64];
+			char detailBuffer[128];
 			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-			wchar_t wc[64];
+			wchar_t wc[128];
 			mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
 			OutputDebugStringW(wc);
 		}
@@ -168,14 +168,14 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 				PrintTimeStampToTextFile(fout);
 				
 				// Print the file, function, and line the LOG statement was called on.
-				char detailBuffer[64];
+				char detailBuffer[128];
 				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 				fout << detailBuffer;
 			}
 			else if (Detail == DetailLevel::Medium)
 			{
 				// Print the file, function, and line the LOG statement was called on.
-				char detailBuffer[64];
+				char detailBuffer[128];
 				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 				fout << detailBuffer;
 			}

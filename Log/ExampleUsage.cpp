@@ -28,27 +28,27 @@
 int main(int, const char*[])
 {
 	// Test out logging to the output window.
-	LOG(OutWin, Debug, OutputWindow, High, "Test Message for the output window.");
+	LOG(OutWin, Debug, OutputWindow, Medium, "Test Message for the output window.");
 	LOG(OutWin, Error, OutputWindow, Medium, "Output %s message to the output window.", "this");
-	LOG(OutWin, Warning, OutputWindow, Low, "This is the %drd message.", 2);
+	LOG(OutWin, Warning, OutputWindow, Medium, "This is the %drd message.", 3);
 	LOG(OutWin, Default, OutputWindow, Medium, "Last message to the output window.");
 
 	// Test out logging to a console window.
-	LOG(ConWinCat, Debug, ConsoleWindow, High, "Let's log some numbers to the console: %d %d %d %d.", 32, 23, 546, 65);
-	LOG(ConWinCat, Error, ConsoleWindow, Medium, "This is a bad error message example.");
+	LOG(ConWinCat, Debug, ConsoleWindow, Low, "Let's log some numbers to the console: %d %d %d %d.", 32, 23, 546, 65);
+	LOG(ConWinCat, Error, ConsoleWindow, Low, "This is a bad error message example.");
 	LOG(ConWinCat, Warning, ConsoleWindow, Low, "Now this would be a possible warning.");
 	LOG(ConWinCat, Default, ConsoleWindow, Low, "Guess we'll just go back to logging %s messages.", "default");
 
 	// Test out logging to a text file.
 	LOG(MyTxtFileCategory, Debug, TextFile, High, "Try logging the number %d to a text file.", 35);
-	LOG(MyTxtFileCategory, Warning, TextFile, Medium, "Yay! I guess %s worked.", "it");
-	LOG(MyTxtFileCategory, Error, TextFile, Medium, "Oh no, some error here.");
-	LOG(MyTxtFileCategory, Default, TextFile, Low, "Some default unimportant message.");
+	LOG(MyTxtFileCategory, Warning, TextFile, High, "Yay! I guess %s worked.", "it");
+	LOG(MyTxtFileCategory, Error, TextFile, High, "Oh no, some error here.");
+	LOG(MyTxtFileCategory, Default, TextFile, High, "Some default unimportant message.");
 
 	// Test out logging to all output forms.
-	LOG(MyAllCategory, Debug, All, High, "Let's log this message to all %d log outputs.", 3);
-	LOG(MyAllCategory, Warning, All, High, "It must have %s, as this message is on all %d areas.", "worked", 3);
-	LOG(MyAllCategory, Default, All, Medium, "Hey look, I'm just a normal message.");
+	LOG(MyAllCategory, Debug, All, Low, "Let's log this message to all %d log outputs.", 3);
+	LOG(MyAllCategory, Warning, All, Low, "Guess it %s, as this message is on all %d areas.", "worked", 3);
+	LOG(MyAllCategory, Default, All, Low, "Hey look, I'm just a normal message.");
 	LOG(MyAllCategory, Error, All, Low, "This must be some error.");
 
 	system("PAUSE");
