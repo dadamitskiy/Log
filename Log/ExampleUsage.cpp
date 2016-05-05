@@ -25,31 +25,56 @@
 #include "Log.h"
 #include <Windows.h>
 
+
+/*
+	Improvements Ideas:
+
+	1. Allow way to declare a log category and specify where it's output and detail level.
+	- Define debug/release enable/disable levels in log category.
+	- Asynchronous log thread(?)
+	- Overriding log during release.
+	- Debug only logging.
+	- Add fatal error that halts program in release, goes to debugger at breakpoint in debug
+	- Fatal grabs callstack(?)
+	- Add priorities of log(?)
+	- Take out endl because '\n' is faster
+	- No size limit to amount of character in msg.
+	- Optimizations and speed comparisons.
+	- Cross platform.
+
+	//https://msdn.microsoft.com/en-us/library/f408b4et.aspx
+*/
+
 int main(int, const char*[])
 {
+	if (Log::IsDebuggerAttached())
+	{
+		DA_LOG(Test, Debug, ConsoleWindow, Low, "Detecting a debugger attached.");
+	}
+
 	// Test out logging to the output window.
-	LOG(OutWin, Debug, OutputWindow, Medium, "Test Message for the output window.");
-	LOG(OutWin, Error, OutputWindow, Medium, "Output %s message to the output window.", "this");
-	LOG(OutWin, Warning, OutputWindow, Medium, "This is the %drd message.", 3);
-	LOG(OutWin, Default, OutputWindow, Medium, "Last message to the output window.");
+	DA_LOG(OutWin, Debug, OutputWindow, Medium, "Test Message for the output window.");
+	DA_LOG(OutWin, Error, OutputWindow, Medium, "Output %s message to the output window.", "this");
+	DA_LOG(OutWin, Warning, OutputWindow, Medium, "This is the %drd message.", 3);
+	DA_LOG(OutWin, Default, OutputWindow, Medium, "Last message to the output window.");
 
 	// Test out logging to a console window.
-	LOG(ConWinCat, Debug, ConsoleWindow, Low, "Let's log some numbers to the console: %d %d %d %d.", 32, 23, 546, 65);
-	LOG(ConWinCat, Error, ConsoleWindow, Low, "This is a bad error message example.");
-	LOG(ConWinCat, Warning, ConsoleWindow, Low, "Now this would be a possible warning.");
-	LOG(ConWinCat, Default, ConsoleWindow, Low, "Guess we'll just go back to logging %s messages.", "default");
+	DA_LOG(ConWinCat, Debug, ConsoleWindow, Low, "Let's log some numbers to the console: %d %d %d %d.", 32, 23, 546, 65);
+	DA_LOG(ConWinCat, Error, ConsoleWindow, Low, "This is a bad error message example.");
+	DA_LOG(ConWinCat, Warning, ConsoleWindow, Low, "Now this would be a possible warning.");
+	DA_LOG(ConWinCat, Default, ConsoleWindow, Low, "Guess we'll just go back to logging %s messages.", "default");
 
 	// Test out logging to a text file.
-	LOG(MyTxtFileCategory, Debug, TextFile, High, "Try logging the number %d to a text file.", 35);
-	LOG(MyTxtFileCategory, Warning, TextFile, High, "Yay! I guess %s worked.", "it");
-	LOG(MyTxtFileCategory, Error, TextFile, High, "Oh no, some error here.");
-	LOG(MyTxtFileCategory, Default, TextFile, High, "Some default unimportant message.");
+	DA_LOG(MyTxtFileCategory, Debug, TextFile, High, "Try logging the number %d to a text file.", 35);
+	DA_LOG(MyTxtFileCategory, Warning, TextFile, High, "Yay! I guess %s worked.", "it");
+	DA_LOG(MyTxtFileCategory, Error, TextFile, High, "Oh no, some error here.");
+	DA_LOG(MyTxtFileCategory, Default, TextFile, High, "Some default unimportant message.");
 
 	// Test out logging to all output forms.
-	LOG(MyAllCategory, Debug, All, Low, "Let's log this message to all %d log outputs.", 3);
-	LOG(MyAllCategory, Warning, All, Low, "Guess it %s, as this message is on all %d areas.", "worked", 3);
-	LOG(MyAllCategory, Default, All, Low, "Hey look, I'm just a normal message.");
-	LOG(MyAllCategory, Error, All, Low, "This must be some error.");
+	DA_LOG(MyAllCategory, Debug, All, Low, "Let's log this message to all %d log outputs.", 3);
+	DA_LOG(MyAllCategory, Warning, All, Low, "Guess it %s, as this message is on all %d areas.", "worked", 3);
+	DA_LOG(MyAllCategory, Default, All, Low, "Hey look, I'm just a normal message.");
+	DA_LOG(MyAllCategory, Error, All, Low, "This must be some error.");
 
 	system("PAUSE");
 	return 0;

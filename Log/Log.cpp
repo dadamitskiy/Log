@@ -267,3 +267,8 @@ void Log::ResetTextColor()
 	// Set the color to white.
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
+
+const bool Log::IsDebuggerAttached()
+{
+	return (IsDebuggerPresent() != 0);
+}

@@ -30,7 +30,15 @@
 #include <crtdefs.h>
 #include <fstream>
 
-#define LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
+#if _DEBUG
+#define COMPILER_DEBUG		1
+#define COMPILER_RELEASE	0
+#else
+#define COMPILER_DEBUG		0
+#define COMPILER_RELEASE	1
+#endif
+
+#define DA_LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
 	#Category, Log::Verbosity::##VerbosityLevel, Log::OutputMethod::##OutputType, Log::DetailLevel::##Detail, Format,\
 	__VA_ARGS__);
 
@@ -92,6 +100,9 @@ namespace Log
 
 	/* Reset the text color to white. */
 	void ResetTextColor();
+
+	/** Checks if the debugger is currently attached. */
+	const bool IsDebuggerAttached();
 }
 
 #endif
