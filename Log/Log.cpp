@@ -66,6 +66,10 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 		{
 			printf("ERROR: ");
 		}
+		else if (VerbosityLevel == Verbosity::Fatal)
+		{
+			printf("FATAL: ");
+		}
 
 		// Print out the LOG message.
 		va_list ap;
@@ -123,6 +127,10 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 		else if (VerbosityLevel == Verbosity::Error)
 		{
 			OutputDebugStringW(L"ERROR: ");
+		}
+		else if (VerbosityLevel == Verbosity::Fatal)
+		{
+			OutputDebugStringW(L"FATAL: ");
 		}
 
 		// Store the LOG message into the streamBuffer array.
@@ -200,10 +208,32 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 			{
 				fout << "ERROR: ";
 			}
+			else if (VerbosityLevel == Verbosity::Fatal)
+			{
+				fout << "FATAL: ";
+			}
 
 			fout << streamBuffer << std::endl;
 			fout.close();
 		}
+	}
+
+	// After we're done logging information, ensure fatal errors are caught.
+	if (VerbosityLevel == Verbosity::Fatal)
+	{
+		HandleFatalError();
+	}
+}
+
+void Log::HandleFatalError()
+{
+	if (Log::IsDebuggerAttached() == true)
+	{
+		__debugbreak();
+	}
+	else
+	{
+		throw std::runtime_error("FATAL ERROR encountered.");
 	}
 }
 
@@ -250,6 +280,10 @@ void Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 		break;
 	case Verbosity::Error:
+		// Set the color to red.
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+		break;
+	case Verbosity::Fatal:
 		// Set the color to red.
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 		break;

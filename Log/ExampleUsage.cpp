@@ -25,24 +25,24 @@
 #include "Log.h"
 #include <Windows.h>
 
-
 /*
 	Improvements Ideas:
 
-	1. Allow way to declare a log category and specify where it's output and detail level.
+	- Allow way to declare a log category and specify where it's output and detail level.
 	- Define debug/release enable/disable levels in log category.
-	- Asynchronous log thread(?)
+	- Asynchronous log thread(?) and thread safe.
 	- Overriding log during release.
 	- Debug only logging.
-	- Add fatal error that halts program in release, goes to debugger at breakpoint in debug
 	- Fatal grabs callstack(?)
 	- Add priorities of log(?)
 	- Take out endl because '\n' is faster
 	- No size limit to amount of character in msg.
 	- Optimizations and speed comparisons.
-	- Cross platform.
-
-	//https://msdn.microsoft.com/en-us/library/f408b4et.aspx
+	- Cross platform support. (Linux, Mac, Android, etc.)
+	- Add asserts type in as well?
+	- Cleanup code in in printing implementation. It could use some work.
+	- Consider a design pattern implementation
+		- Improve overall fatal error usage/code. 
 */
 
 int main(int, const char*[])
@@ -51,6 +51,9 @@ int main(int, const char*[])
 	{
 		DA_LOG(Test, Debug, ConsoleWindow, Low, "Detecting a debugger attached.");
 	}
+	
+	// DA_LOG(Test, Fatal, All, Low, "Something bad is happening.");
+
 
 	// Test out logging to the output window.
 	DA_LOG(OutWin, Debug, OutputWindow, Medium, "Test Message for the output window.");

@@ -31,11 +31,11 @@
 #include <fstream>
 
 #if _DEBUG
-#define COMPILER_DEBUG		1
-#define COMPILER_RELEASE	0
+#define DA_DEBUG	1
+#define DA_RELEASE	0
 #else
-#define COMPILER_DEBUG		0
-#define COMPILER_RELEASE	1
+#define DA_DEBUG	0
+#define DA_RELEASE	1
 #endif
 
 #define DA_LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
@@ -57,6 +57,7 @@ namespace Log
 			Debug,
 			Warning,
 			Error,
+			Fatal,
 		};
 	}
 	
@@ -85,6 +86,9 @@ namespace Log
 
 	/* Print the desired message to the desired location in the desired detail. */
 	void Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...);
+
+	/* Handle encountering a fatal error. */
+	void HandleFatalError();
 
 	/* Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */
 	void PrintTimeStampToConsoleWindow();
