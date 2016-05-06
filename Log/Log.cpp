@@ -26,6 +26,7 @@
 #include <ctime>
 #include <direct.h>
 #include <Windows.h>
+#include <memory>
 
 void Log::Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...)
 {
@@ -114,16 +115,16 @@ void Log::PrintToOutputWindow(const char* File, const char* Function, int LineNu
 	if (Detail != DetailLevel::Low)
 	{
 		// Output the file, function, and line the LOG statement was called on.
-		char detailBuffer[128];
-		sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-		wchar_t wc[128];
+		char detailBuffer[512];
+		_snprintf_s(detailBuffer, _TRUNCATE, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+		wchar_t wc[512];
 		mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
 		OutputDebugStringW(wc);
 	}
 
 	// Output the log category.
 	char outputCategory[64];
-	sprintf_s(outputCategory, "Log%s ", LogCategory);
+	_snprintf_s(outputCategory, _TRUNCATE, "Log%s ", LogCategory);
 	wchar_t wOutputCategory[64];
 	mbstowcs_s(nullptr, wOutputCategory, outputCategory, _TRUNCATE);
 	OutputDebugStringW(wOutputCategory);
@@ -149,7 +150,7 @@ void Log::PrintToOutputWindow(const char* File, const char* Function, int LineNu
 	{
 		OutputDebugStringW(L"FATAL: ");
 	}
-
+	
 	// Store the LOG message into the streamBuffer array.
 	char streamBuffer[512];
 	vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, Args);
@@ -194,7 +195,7 @@ void Log::PrintToTextFile(const char* File, const char* Function, int LineNumber
 		{
 			// Print the file, function, and line the LOG statement was called on.
 			char detailBuffer[128];
-			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+			_snprintf_s(detailBuffer, _TRUNCATE, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
 			fout << detailBuffer;
 		}
 

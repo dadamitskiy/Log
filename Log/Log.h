@@ -30,6 +30,17 @@
 #include <crtdefs.h>
 #include <fstream>
 
+#define DA_LOG_MAJOR_VERSION 1
+#define DA_LOG_MINOR_VERSION 5
+
+#if _DEBUG
+#define DA_DEBUG	1
+#define DA_RELEASE	0
+#else
+#define DA_DEBUG	0
+#define DA_RELEASE	1
+#endif
+
 #define DA_LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
 	#Category, Log::Verbosity::##VerbosityLevel, Log::OutputMethod::##OutputType, Log::DetailLevel::##Detail, Format,\
 	__VA_ARGS__);
