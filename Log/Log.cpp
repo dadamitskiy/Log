@@ -29,199 +29,199 @@
 
 void Log::Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...)
 {
+	va_list ap;
+	va_start(ap, Format);
+
 	if (OutMethod == OutputMethod::ConsoleWindow || OutMethod == OutputMethod::All)
 	{
-		SetTextColorToVerbosityLevel(VerbosityLevel);
-
-		if (Detail == DetailLevel::High)
-		{
-			PrintTimeStampToConsoleWindow();
-
-			// Print the file, function, and line the LOG statement was called on.
-			printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-		}
-		else if (Detail == DetailLevel::Medium)
-		{
-			// Print the file, function, and line the LOG statement was called on.
-			printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-		}
-
-		// Print out the category.
-		printf("Log%s ", LogCategory);
-
-		// Print out the log calls verbosity level.
-		if (VerbosityLevel == Verbosity::Default)
-		{
-			printf("DEFAULT: ");
-		}
-		else if (VerbosityLevel == Verbosity::Debug)
-		{
-			printf("DEBUG: ");
-		}
-		else if (VerbosityLevel == Verbosity::Warning)
-		{
-			printf("WARNING: ");
-		}
-		else if (VerbosityLevel == Verbosity::Error)
-		{
-			printf("ERROR: ");
-		}
-		else if (VerbosityLevel == Verbosity::Fatal)
-		{
-			printf("FATAL: ");
-		}
-
-		// Print out the LOG message.
-		va_list ap;
-		va_start(ap, Format);
-		vprintf(Format, ap);
-		va_end(ap);
-		printf("\n");
+		PrintToConsoleWindow(File, Function, LineNumber, LogCategory, VerbosityLevel, Detail, Format, ap);
 	}
 
 	if (OutMethod == OutputMethod::OutputWindow || OutMethod == OutputMethod::All)
 	{
-		// Ensure we are using Visual Studio to compile the code if we intend to log to its output window.
-#if defined(_MSC_VER)
-		if (Detail == DetailLevel::High)
-		{
-			PrintTimeStampToOutputWindow();
-
-			// Output the file, function, and line the LOG statement was called on.
-			char detailBuffer[128];
-			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-			wchar_t wc[128];
-			mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
-			OutputDebugStringW(wc);
-		}
-		else if (Detail == DetailLevel::Medium)
-		{
-			// Output the file, function, and line the LOG statement was called on.
-			char detailBuffer[128];
-			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-			wchar_t wc[128];
-			mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
-			OutputDebugStringW(wc);
-		}
-
-		// Output the log category.
-		char outputCategory[64];
-		sprintf_s(outputCategory, "Log%s ", LogCategory);
-		wchar_t wOutputCategory[64];
-		mbstowcs_s(nullptr, wOutputCategory, outputCategory, _TRUNCATE);
-		OutputDebugStringW(wOutputCategory);
-
-		// Output the verbosity level.
-		if (VerbosityLevel == Verbosity::Default)
-		{
-			OutputDebugStringW(L"DEFAULT: ");
-		}
-		else if (VerbosityLevel == Verbosity::Debug)
-		{
-			OutputDebugStringW(L"DEBUG: ");
-		}
-		else if (VerbosityLevel == Verbosity::Warning)
-		{
-			OutputDebugStringW(L"WARNING: ");
-		}
-		else if (VerbosityLevel == Verbosity::Error)
-		{
-			OutputDebugStringW(L"ERROR: ");
-		}
-		else if (VerbosityLevel == Verbosity::Fatal)
-		{
-			OutputDebugStringW(L"FATAL: ");
-		}
-
-		// Store the LOG message into the streamBuffer array.
-		char streamBuffer[512];
-		va_list args;
-		va_start(args, Format);
-		vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, args);
-		va_end(args);
-
-		// Output the LOG message to the output window.
-		wchar_t wc[512];
-		mbstowcs_s(nullptr, wc, streamBuffer, _TRUNCATE);
-		OutputDebugStringW(wc);
-		OutputDebugStringW(L"\n");
-#endif
+		PrintToOutputWindow(File, Function, LineNumber, LogCategory, VerbosityLevel, Detail, Format, ap);
 	}
 	
 	if (OutMethod == OutputMethod::TextFile || OutMethod == OutputMethod::All)
 	{
-		// If an OutputLogs folder does not exist, create one.
-		DWORD filetype = GetFileAttributes(L"OutputLogs");
-		if (filetype == INVALID_FILE_ATTRIBUTES && (filetype & FILE_ATTRIBUTE_DIRECTORY))
-		{
-			_mkdir("OutputLogs");
-		}
-
-		// Setup the text file name and path based off of the category name.
-		std::string filename = "OutputLogs/";
-		filename += LogCategory;
-		filename += ".txt";
-		
-		// Store the LOG message into streamBuffer.
-		char streamBuffer[512];
-		va_list args;
-		va_start(args, Format);
-		vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, args);
-		va_end(args);
-
-		// Append the data to a text file.
-		std::ofstream fout;
-		fout.open(filename.c_str(), std::ios_base::out | std::ios_base::app);
-		if (fout.is_open())
-		{
-			if (Detail == DetailLevel::High)
-			{
-				PrintTimeStampToTextFile(fout);
-				
-				// Print the file, function, and line the LOG statement was called on.
-				char detailBuffer[128];
-				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-				fout << detailBuffer;
-			}
-			else if (Detail == DetailLevel::Medium)
-			{
-				// Print the file, function, and line the LOG statement was called on.
-				char detailBuffer[128];
-				sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
-				fout << detailBuffer;
-			}
-
-			// Print out the verbosity level.
-			if (VerbosityLevel == Verbosity::Default)
-			{
-				fout << "DEFAULT: ";
-			}
-			else if (VerbosityLevel == Verbosity::Debug)
-			{
-				fout << "DEBUG: ";
-			}
-			else if (VerbosityLevel == Verbosity::Warning)
-			{
-				fout << "WARNING: ";
-			}
-			else if (VerbosityLevel == Verbosity::Error)
-			{
-				fout << "ERROR: ";
-			}
-			else if (VerbosityLevel == Verbosity::Fatal)
-			{
-				fout << "FATAL: ";
-			}
-
-			fout << streamBuffer << std::endl;
-			fout.close();
-		}
+		PrintToTextFile(File, Function, LineNumber, LogCategory, VerbosityLevel, Detail, Format, ap);
 	}
+
+	va_end(ap);
 
 	// After we're done logging information, ensure fatal errors are caught.
 	if (VerbosityLevel == Verbosity::Fatal)
 	{
 		HandleFatalError();
+	}
+}
+
+void Log::PrintToConsoleWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
+{
+	// Print out the LOG message.
+	SetTextColorToVerbosityLevel(VerbosityLevel);
+
+	if (Detail == DetailLevel::High)
+	{
+		PrintTimeStampToConsoleWindow();
+	}
+
+	if (Detail != DetailLevel::Low)
+	{
+		// Print the file, function, and line the LOG statement was called on.
+		printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+	}
+
+	// Print out the category.
+	printf("Log%s ", LogCategory);
+
+	// Print out the log calls verbosity level.
+	if (VerbosityLevel == Verbosity::Default)
+	{
+		printf("DEFAULT: ");
+	}
+	else if (VerbosityLevel == Verbosity::Debug)
+	{
+		printf("DEBUG: ");
+	}
+	else if (VerbosityLevel == Verbosity::Warning)
+	{
+		printf("WARNING: ");
+	}
+	else if (VerbosityLevel == Verbosity::Error)
+	{
+		printf("ERROR: ");
+	}
+	else if (VerbosityLevel == Verbosity::Fatal)
+	{
+		printf("FATAL: ");
+	}
+
+	vprintf(Format, Args);
+
+	printf("\n");
+}
+
+void Log::PrintToOutputWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
+{
+	// Ensure we are using Visual Studio to compile the code if we intend to log to its output window.
+#if defined(_MSC_VER)
+	if (Detail == DetailLevel::High)
+	{
+		PrintTimeStampToOutputWindow();
+	}
+
+	if (Detail != DetailLevel::Low)
+	{
+		// Output the file, function, and line the LOG statement was called on.
+		char detailBuffer[128];
+		sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+		wchar_t wc[128];
+		mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
+		OutputDebugStringW(wc);
+	}
+
+	// Output the log category.
+	char outputCategory[64];
+	sprintf_s(outputCategory, "Log%s ", LogCategory);
+	wchar_t wOutputCategory[64];
+	mbstowcs_s(nullptr, wOutputCategory, outputCategory, _TRUNCATE);
+	OutputDebugStringW(wOutputCategory);
+
+	// Output the verbosity level.
+	if (VerbosityLevel == Verbosity::Default)
+	{
+		OutputDebugStringW(L"DEFAULT: ");
+	}
+	else if (VerbosityLevel == Verbosity::Debug)
+	{
+		OutputDebugStringW(L"DEBUG: ");
+	}
+	else if (VerbosityLevel == Verbosity::Warning)
+	{
+		OutputDebugStringW(L"WARNING: ");
+	}
+	else if (VerbosityLevel == Verbosity::Error)
+	{
+		OutputDebugStringW(L"ERROR: ");
+	}
+	else if (VerbosityLevel == Verbosity::Fatal)
+	{
+		OutputDebugStringW(L"FATAL: ");
+	}
+
+	// Store the LOG message into the streamBuffer array.
+	char streamBuffer[512];
+	vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, Args);
+
+	// Output the LOG message to the output window.
+	wchar_t wc[512];
+	mbstowcs_s(nullptr, wc, streamBuffer, _TRUNCATE);
+	OutputDebugStringW(wc);
+	OutputDebugStringW(L"\n");
+#endif
+}
+
+void Log::PrintToTextFile(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
+{
+	// If an OutputLogs folder does not exist, create one.
+	DWORD filetype = GetFileAttributes(L"OutputLogs");
+	if (filetype == INVALID_FILE_ATTRIBUTES && (filetype & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		_mkdir("OutputLogs");
+	}
+
+	// Setup the text file name and path based off of the category name.
+	std::string filename = "OutputLogs/";
+	filename += LogCategory;
+	filename += ".txt";
+
+	// Store the LOG message into streamBuffer.
+	char streamBuffer[512];
+	vsnprintf_s(streamBuffer, _countof(streamBuffer), _TRUNCATE, Format, Args);
+
+	// Append the data to a text file.
+	std::ofstream fout;
+	fout.open(filename.c_str(), std::ios_base::out | std::ios_base::app);
+	if (fout.is_open())
+	{
+		if (Detail == DetailLevel::High)
+		{
+			PrintTimeStampToTextFile(fout);
+		}
+
+		if (Detail != DetailLevel::Low)
+		{
+			// Print the file, function, and line the LOG statement was called on.
+			char detailBuffer[128];
+			sprintf_s(detailBuffer, "[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber);
+			fout << detailBuffer;
+		}
+
+		// Print out the verbosity level.
+		if (VerbosityLevel == Verbosity::Default)
+		{
+			fout << "DEFAULT: ";
+		}
+		else if (VerbosityLevel == Verbosity::Debug)
+		{
+			fout << "DEBUG: ";
+		}
+		else if (VerbosityLevel == Verbosity::Warning)
+		{
+			fout << "WARNING: ";
+		}
+		else if (VerbosityLevel == Verbosity::Error)
+		{
+			fout << "ERROR: ";
+		}
+		else if (VerbosityLevel == Verbosity::Fatal)
+		{
+			fout << "FATAL: ";
+		}
+
+		fout << streamBuffer << std::endl;
+		fout.close();
 	}
 }
 

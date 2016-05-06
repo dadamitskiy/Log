@@ -28,32 +28,26 @@
 /*
 	Improvements Ideas:
 
-	- Allow way to declare a log category and specify where it's output and detail level.
+	1. No size limit to amount of character in msg.
+	2. Asynchronous log thread(?) and thread safe.
+	3. Allow way to declare a log category and specify where it's output and detail level.
 	- Define debug/release enable/disable levels in log category.
-	- Asynchronous log thread(?) and thread safe.
 	- Overriding log during release.
 	- Debug only logging.
 	- Fatal grabs callstack(?)
 	- Add priorities of log(?)
 	- Take out endl because '\n' is faster
-	- No size limit to amount of character in msg.
 	- Optimizations and speed comparisons.
 	- Cross platform support. (Linux, Mac, Android, etc.)
 	- Add asserts type in as well?
-	- Cleanup code in in printing implementation. It could use some work.
 	- Consider a design pattern implementation
-		- Improve overall fatal error usage/code. 
+		- Improve overall fatal error usage/code.
+		- Cleanup code some more/do more optimization
 */
 
 int main(int, const char*[])
 {
-	if (Log::IsDebuggerAttached())
-	{
-		DA_LOG(Test, Debug, ConsoleWindow, Low, "Detecting a debugger attached.");
-	}
-	
-	// DA_LOG(Test, Fatal, All, Low, "Something bad is happening.");
-
+	// DA_LOG(Test, Fatal, All, Low, "This is how you can signify something bad has happened.");
 
 	// Test out logging to the output window.
 	DA_LOG(OutWin, Debug, OutputWindow, Medium, "Test Message for the output window.");

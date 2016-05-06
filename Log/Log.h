@@ -30,14 +30,6 @@
 #include <crtdefs.h>
 #include <fstream>
 
-#if _DEBUG
-#define DA_DEBUG	1
-#define DA_RELEASE	0
-#else
-#define DA_DEBUG	0
-#define DA_RELEASE	1
-#endif
-
 #define DA_LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
 	#Category, Log::Verbosity::##VerbosityLevel, Log::OutputMethod::##OutputType, Log::DetailLevel::##Detail, Format,\
 	__VA_ARGS__);
@@ -86,6 +78,15 @@ namespace Log
 
 	/* Print the desired message to the desired location in the desired detail. */
 	void Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...);
+
+	/* Print to the console window. */
+	void PrintToConsoleWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
+
+	/* Print to the Visual Studio output window. */
+	void PrintToOutputWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
+
+	/* Print to the specified Log Category text file. */
+	void PrintToTextFile(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
 
 	/* Handle encountering a fatal error. */
 	void HandleFatalError();
