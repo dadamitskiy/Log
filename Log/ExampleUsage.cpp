@@ -1,4 +1,4 @@
-/*
+/**
  * The MIT License (MIT)
  *
  * Copyright (c) 2015-2016 Daniel Adamitskiy
@@ -25,30 +25,8 @@
 #include "Log.h"
 #include <Windows.h>
 
-/*
-	Improvements Ideas:
-
-	1. No size limit to amount of character in msg.
-	2. Asynchronous log thread(?) and thread safe.
-	3. Allow way to declare a log category and specify where it's output and detail level.
-	- Define debug/release enable/disable levels in log category.
-	- Overriding log during release.
-	- Debug only logging.
-	- Fatal grabs callstack(?)
-	- Add priorities of log(?)
-	- Take out endl because '\n' is faster
-	- Optimizations and speed comparisons.
-	- Cross platform support. (Linux, Mac, Android, etc.)
-	- Add asserts type in as well?
-	- Consider a design pattern implementation
-		- Improve overall fatal error usage/code.
-		- Cleanup code some more/do more optimization
-*/
-
 int main(int, const char*[])
 {
-	// DA_LOG(Test, Fatal, All, Low, "This is how you can signify something bad has happened.");
-
 	// Test out logging to the output window.
 	DA_LOG(OutWin, Debug, OutputWindow, Medium, "Test Message for the output window.");
 	DA_LOG(OutWin, Error, OutputWindow, Medium, "Output %s message to the output window.", "this");
@@ -71,7 +49,7 @@ int main(int, const char*[])
 	DA_LOG(MyAllCategory, Debug, All, Low, "Let's log this message to all %d log outputs.", 3);
 	DA_LOG(MyAllCategory, Warning, All, Low, "Guess it %s, as this message is on all %d areas.", "worked", 3);
 	DA_LOG(MyAllCategory, Default, All, Low, "Hey look, I'm just a normal message.");
-	DA_LOG(MyAllCategory, Error, All, Low, "This must be some error.");
+	DA_LOG(MyAllCategory, Error, All, Low, "This would log some error.");
 
 	system("PAUSE");
 	return 0;

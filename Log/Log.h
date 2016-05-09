@@ -1,4 +1,4 @@
-/*
+/**
  * The MIT License (MIT)
  *
  * Copyright (c) 2015-2016 Daniel Adamitskiy
@@ -31,27 +31,19 @@
 #include <fstream>
 
 #define DA_LOG_MAJOR_VERSION 1
-#define DA_LOG_MINOR_VERSION 5
-
-#if _DEBUG
-#define DA_DEBUG	1
-#define DA_RELEASE	0
-#else
-#define DA_DEBUG	0
-#define DA_RELEASE	1
-#endif
+#define DA_LOG_MINOR_VERSION 6
 
 #define DA_LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
 	#Category, Log::Verbosity::##VerbosityLevel, Log::OutputMethod::##OutputType, Log::DetailLevel::##Detail, Format,\
 	__VA_ARGS__);
 
-/*
+/**
  * A namespace containing the functions needed to log information to a console window, text file, or an output 
  * window. A namespace is used over a struct or class because there are no data members to store in a Log object. 
  */
 namespace Log
 {
-	/* Verbosity levels for logging messages with varying importance. */
+	/** Verbosity levels for logging messages with varying importance. */
 	namespace Verbosity
 	{
 		enum Type
@@ -64,7 +56,7 @@ namespace Log
 		};
 	}
 	
-	/* Different destinations to output to. */
+	/** Different destinations to output to. */
 	namespace OutputMethod
 	{
 		enum Type
@@ -76,7 +68,7 @@ namespace Log
 		};
 	}
 	
-	/* Varying levels of detail included in a log statement. */
+	/** Varying levels of detail included in a log statement. */
 	namespace DetailLevel
 	{
 		enum Type
@@ -87,34 +79,34 @@ namespace Log
 		};
 	}
 
-	/* Print the desired message to the desired location in the desired detail. */
+	/** Print the desired message to the desired location in the desired detail. */
 	void Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...);
 
-	/* Print to the console window. */
+	/** Print to the console window. */
 	void PrintToConsoleWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
 
-	/* Print to the Visual Studio output window. */
+	/** Print to the Visual Studio output window. */
 	void PrintToOutputWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
 
-	/* Print to the specified Log Category text file. */
+	/** Print to the specified Log Category text file. */
 	void PrintToTextFile(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
 
-	/* Handle encountering a fatal error. */
+	/** Handle encountering a fatal error. */
 	void HandleFatalError();
 
-	/* Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */
+	/** Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */
 	void PrintTimeStampToConsoleWindow();
 
-	/* Print a timestamp to Visual Studio output window. */
+	/** Print a timestamp to Visual Studio output window. */
 	void PrintTimeStampToOutputWindow();
 
-	/* Print a timestamp to a text file. */
+	/** Print a timestamp to a text file. */
 	void PrintTimeStampToTextFile(std::ofstream& OutStream);
 
-	/* Set the color of the console window text based on the verbosity level. */
+	/** Set the color of the console window text based on the verbosity level. */
 	void SetTextColorToVerbosityLevel(Verbosity::Type InLevel);
 
-	/* Reset the text color to white. */
+	/** Reset the text color to white. */
 	void ResetTextColor();
 
 	/** Checks if the debugger is currently attached. */

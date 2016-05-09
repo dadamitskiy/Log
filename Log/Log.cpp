@@ -1,4 +1,4 @@
-/*
+/**
  * The MIT License (MIT)
  *
  * Copyright (c) 2015-2016 Daniel Adamitskiy
@@ -26,7 +26,6 @@
 #include <ctime>
 #include <direct.h>
 #include <Windows.h>
-#include <memory>
 
 void Log::Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...)
 {
@@ -120,6 +119,8 @@ void Log::PrintToOutputWindow(const char* File, const char* Function, int LineNu
 		wchar_t wc[512];
 		mbstowcs_s(nullptr, wc, detailBuffer, _TRUNCATE);
 		OutputDebugStringW(wc);
+
+		//OutputDebugStringW(Printf("[File: %s, Function: %s, Line: %d] - ", File, Function, LineNumber));
 	}
 
 	// Output the log category.
