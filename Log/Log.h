@@ -22,33 +22,30 @@
  * THE SOFTWARE.
  */
 
-#ifndef _LOG_H_
-#define _LOG_H_
+#ifndef __LOG_H__
+#define __LOG_H__
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <crtdefs.h>
 #include <fstream>
+#include <unordered_map>
+#include <string>
 
 #define DA_LOG_MAJOR_VERSION 1
-#define DA_LOG_MINOR_VERSION 6
+#define DA_LOG_MINOR_VERSION 7
 
-#define DA_LOG(Category, VerbosityLevel, OutputType, Detail, Format, ...) Log::Print(__FILE__, __FUNCTION__, __LINE__,  \
-	#Category, Log::Verbosity::##VerbosityLevel, Log::OutputMethod::##OutputType, Log::DetailLevel::##Detail, Format,\
-	__VA_ARGS__);
+#define DA_DECLARE_LOG_CATEGORY(Category, OutputType, Detail) DA::Log::GetInstance().DeclareLogCategory(#Category, DA::OutputMethod::##OutputType, DA::DetailLevel::##Detail);
+#define DA_LOG(Category, VerbosityLevel, Format, ...) DA::Log::GetInstance().Print(__FILE__, __FUNCTION__, __LINE__, #Category, DA::Verbosity::##VerbosityLevel, Format, __VA_ARGS__);
 
-/**
- * A namespace containing the functions needed to log information to a console window, text file, or an output 
- * window. A namespace is used over a struct or class because there are no data members to store in a Log object. 
- */
-namespace Log
+namespace DA
 {
 	/** Verbosity levels for logging messages with varying importance. */
 	namespace Verbosity
 	{
 		enum Type
 		{
-			Default,
+			Info,
 			Debug,
 			Warning,
 			Error,
@@ -79,38 +76,87 @@ namespace Log
 		};
 	}
 
-	/** Print the desired message to the desired location in the desired detail. */
-	void Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...);
+	/** Struct to store Log category info in the map of categories. */
+	struct LogCategory
+	{
+		OutputMethod::Type mOutputMethod;
+		DetailLevel::Type mDetailLevel;
 
-	/** Print to the console window. */
-	void PrintToConsoleWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
+		LogCategory() : 
+			mOutputMethod(OutputMethod::All), 
+			mDetailLevel(DetailLevel::High)
+		{
+		}
 
-	/** Print to the Visual Studio output window. */
-	void PrintToOutputWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
+		LogCategory(OutputMethod::Type OutMethod, DetailLevel::Type Detail) : 
+			mOutputMethod(OutMethod),
+			mDetailLevel(Detail)
+		{
+		}
+	};
 
-	/** Print to the specified Log Category text file. */
-	void PrintToTextFile(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
+	class Log
+	{
+	public:
 
-	/** Handle encountering a fatal error. */
-	void HandleFatalError();
+		Log(const Log&) = delete;
+		void operator=(const Log&) = delete;
 
-	/** Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */
-	void PrintTimeStampToConsoleWindow();
+		/** Return the singleton instance of this Log class. */
+		static __forceinline Log& GetInstance()
+		{
+			static Log instance;
+			return instance;
+		}
 
-	/** Print a timestamp to Visual Studio output window. */
-	void PrintTimeStampToOutputWindow();
+		/** Declare a log category. */
+		void DeclareLogCategory(const char* LogCategory, OutputMethod::Type OutMethod, DetailLevel::Type Detail);
 
-	/** Print a timestamp to a text file. */
-	void PrintTimeStampToTextFile(std::ofstream& OutStream);
+		/** Print the desired message to the desired location in the desired detail. */
+		void Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, const char* Format, ...);
 
-	/** Set the color of the console window text based on the verbosity level. */
-	void SetTextColorToVerbosityLevel(Verbosity::Type InLevel);
+	private:
 
-	/** Reset the text color to white. */
-	void ResetTextColor();
+		Log() = default;
+		~Log() = default;
 
-	/** Checks if the debugger is currently attached. */
-	const bool IsDebuggerAttached();
-}
+		/** Print to the console window. */
+		void PrintToConsoleWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
 
-#endif
+		/** Print to the Visual Studio output window. */
+		void PrintToOutputWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
+
+		/** Print to the specified Log Category text file. */
+		void PrintToTextFile(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args);
+
+		/** Handle encountering a fatal error. */
+		void HandleFatalError();
+
+		/** Print a timestamp in the following order: Year.Month.Day-Hour:Minute:Second */
+		void PrintTimeStampToConsoleWindow();
+
+		/** Print a timestamp to Visual Studio output window. */
+		void PrintTimeStampToOutputWindow();
+
+		/** Print a timestamp to a text file. */
+		void PrintTimeStampToTextFile(std::ofstream& OutStream);
+
+		/** Set the color of the console window text based on the verbosity level. */
+		void SetTextColorToVerbosityLevel(Verbosity::Type InLevel);
+
+		/** Reset the text color to white. */
+		void ResetTextColor();
+
+		/** Checks if the debugger is currently attached. */
+		const bool IsDebuggerAttached();
+
+		/** Checks Log Category container if a log category already exists. */
+		const bool DoesLogCategoryExist(const char* Category) const;
+
+		/** The unordered map containing all log categories. */
+		std::unordered_map<std::string, LogCategory> mLogCategories;
+	};
+
+} // DA
+
+#endif // __LOG_H__

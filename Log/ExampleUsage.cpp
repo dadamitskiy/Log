@@ -27,29 +27,35 @@
 
 int main(int, const char*[])
 {
+	// Declare a few log categories.
+	DA_DECLARE_LOG_CATEGORY(OutWin, OutputWindow, Medium);
+	DA_DECLARE_LOG_CATEGORY(ConWinCat, ConsoleWindow, Low);
+	DA_DECLARE_LOG_CATEGORY(MyTxtFileCategory, TextFile, High);
+	DA_DECLARE_LOG_CATEGORY(MyAllCategory, All, Low);
+
 	// Test out logging to the output window.
-	DA_LOG(OutWin, Debug, OutputWindow, Medium, "Test Message for the output window.");
-	DA_LOG(OutWin, Error, OutputWindow, Medium, "Output %s message to the output window.", "this");
-	DA_LOG(OutWin, Warning, OutputWindow, Medium, "This is the %drd message.", 3);
-	DA_LOG(OutWin, Default, OutputWindow, Medium, "Last message to the output window.");
+	DA_LOG(OutWin, Debug, "Test Message for the output window.");
+	DA_LOG(OutWin, Error, "Output %s message to the output window.", "this");
+	DA_LOG(OutWin, Warning, "This is the %drd message.", 3);
+	DA_LOG(OutWin, Info, "Last message to the output window.");
 
 	// Test out logging to a console window.
-	DA_LOG(ConWinCat, Debug, ConsoleWindow, Low, "Let's log some numbers to the console: %d %d %d %d.", 32, 23, 546, 65);
-	DA_LOG(ConWinCat, Error, ConsoleWindow, Low, "This is a bad error message example.");
-	DA_LOG(ConWinCat, Warning, ConsoleWindow, Low, "Now this would be a possible warning.");
-	DA_LOG(ConWinCat, Default, ConsoleWindow, Low, "Guess we'll just go back to logging %s messages.", "default");
+	DA_LOG(ConWinCat, Debug, "Let's log some numbers to the console: %d %d %d %d.", 32, 23, 546, 65);
+	DA_LOG(ConWinCat, Error, "This is a bad error message example.");
+	DA_LOG(ConWinCat, Warning, "Now this would be a possible warning.");
+	DA_LOG(ConWinCat, Info, "Guess we'll just go back to logging %s messages.", "default");
 
 	// Test out logging to a text file.
-	DA_LOG(MyTxtFileCategory, Debug, TextFile, High, "Try logging the number %d to a text file.", 35);
-	DA_LOG(MyTxtFileCategory, Warning, TextFile, High, "Yay! I guess %s worked.", "it");
-	DA_LOG(MyTxtFileCategory, Error, TextFile, High, "Oh no, some error here.");
-	DA_LOG(MyTxtFileCategory, Default, TextFile, High, "Some default unimportant message.");
+	DA_LOG(MyTxtFileCategory, Debug, "Try logging the number %d to a text file.", 35);
+	DA_LOG(MyTxtFileCategory, Warning, "Yay! I guess %s worked.", "it");
+	DA_LOG(MyTxtFileCategory, Error, "Oh no, some error here.");
+	DA_LOG(MyTxtFileCategory, Info, "Some default unimportant message.");
 
 	// Test out logging to all output forms.
-	DA_LOG(MyAllCategory, Debug, All, Low, "Let's log this message to all %d log outputs.", 3);
-	DA_LOG(MyAllCategory, Warning, All, Low, "Guess it %s, as this message is on all %d areas.", "worked", 3);
-	DA_LOG(MyAllCategory, Default, All, Low, "Hey look, I'm just a normal message.");
-	DA_LOG(MyAllCategory, Error, All, Low, "This would log some error.");
+	DA_LOG(MyAllCategory, Debug, "Let's log this message to all %d log outputs.", 3);
+	DA_LOG(MyAllCategory, Warning, "Guess it %s, as this message is on all %d areas.", "worked", 3);
+	DA_LOG(MyAllCategory, Info, "Hey look, I'm just a normal message.");
+	DA_LOG(MyAllCategory, Error, "This would log some error.");
 
 	system("PAUSE");
 	return 0;

@@ -27,24 +27,41 @@
 #include <direct.h>
 #include <Windows.h>
 
-void Log::Print(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, OutputMethod::Type OutMethod, DetailLevel::Type Detail, const char* Format, ...)
+void DA::Log::DeclareLogCategory(const char* Category, OutputMethod::Type OutMethod, DetailLevel::Type Detail)
 {
+	mLogCategories[std::string(Category)] = LogCategory(OutMethod, Detail);
+}
+
+void DA::Log::Print(const char* File, const char* Function, int LineNumber, const char* Category, Verbosity::Type VerbosityLevel, const char* Format, ...)
+{
+	if (DoesLogCategoryExist(Category) == false)
+	{
+		// If the user hasn't explicitly created a category, silently create one for them.
+		DeclareLogCategory(Category, OutputMethod::All, DetailLevel::High);
+	}
+	
+	const LogCategory lg = mLogCategories[Category];
 	va_list ap;
 	va_start(ap, Format);
 
-	if (OutMethod == OutputMethod::ConsoleWindow || OutMethod == OutputMethod::All)
+	switch (lg.mOutputMethod)
 	{
-		PrintToConsoleWindow(File, Function, LineNumber, LogCategory, VerbosityLevel, Detail, Format, ap);
-	}
-
-	if (OutMethod == OutputMethod::OutputWindow || OutMethod == OutputMethod::All)
-	{
-		PrintToOutputWindow(File, Function, LineNumber, LogCategory, VerbosityLevel, Detail, Format, ap);
-	}
-	
-	if (OutMethod == OutputMethod::TextFile || OutMethod == OutputMethod::All)
-	{
-		PrintToTextFile(File, Function, LineNumber, LogCategory, VerbosityLevel, Detail, Format, ap);
+	case OutputMethod::ConsoleWindow:
+		PrintToConsoleWindow(File, Function, LineNumber, Category, VerbosityLevel, lg.mDetailLevel, Format, ap);
+		break;
+	case OutputMethod::OutputWindow:
+		PrintToOutputWindow(File, Function, LineNumber, Category, VerbosityLevel, lg.mDetailLevel, Format, ap);
+		break;
+	case OutputMethod::TextFile:
+		PrintToTextFile(File, Function, LineNumber, Category, VerbosityLevel, lg.mDetailLevel, Format, ap);
+		break;
+	case OutputMethod::All:
+		// Intended fallthrough.
+	default:
+		PrintToConsoleWindow(File, Function, LineNumber, Category, VerbosityLevel, lg.mDetailLevel, Format, ap);
+		PrintToOutputWindow(File, Function, LineNumber, Category, VerbosityLevel, lg.mDetailLevel, Format, ap);
+		PrintToTextFile(File, Function, LineNumber, Category, VerbosityLevel, lg.mDetailLevel, Format, ap);
+		break;
 	}
 
 	va_end(ap);
@@ -56,7 +73,7 @@ void Log::Print(const char* File, const char* Function, int LineNumber, const ch
 	}
 }
 
-void Log::PrintToConsoleWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
+void DA::Log::PrintToConsoleWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
 {
 	// Print out the LOG message.
 	SetTextColorToVerbosityLevel(VerbosityLevel);
@@ -76,9 +93,9 @@ void Log::PrintToConsoleWindow(const char* File, const char* Function, int LineN
 	printf("Log%s ", LogCategory);
 
 	// Print out the log calls verbosity level.
-	if (VerbosityLevel == Verbosity::Default)
+	if (VerbosityLevel == Verbosity::Info)
 	{
-		printf("DEFAULT: ");
+		printf("INFO: ");
 	}
 	else if (VerbosityLevel == Verbosity::Debug)
 	{
@@ -102,7 +119,7 @@ void Log::PrintToConsoleWindow(const char* File, const char* Function, int LineN
 	printf("\n");
 }
 
-void Log::PrintToOutputWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
+void DA::Log::PrintToOutputWindow(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
 {
 	// Ensure we are using Visual Studio to compile the code if we intend to log to its output window.
 #if defined(_MSC_VER)
@@ -131,9 +148,9 @@ void Log::PrintToOutputWindow(const char* File, const char* Function, int LineNu
 	OutputDebugStringW(wOutputCategory);
 
 	// Output the verbosity level.
-	if (VerbosityLevel == Verbosity::Default)
+	if (VerbosityLevel == Verbosity::Info)
 	{
-		OutputDebugStringW(L"DEFAULT: ");
+		OutputDebugStringW(L"INFO: ");
 	}
 	else if (VerbosityLevel == Verbosity::Debug)
 	{
@@ -164,7 +181,7 @@ void Log::PrintToOutputWindow(const char* File, const char* Function, int LineNu
 #endif
 }
 
-void Log::PrintToTextFile(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
+void DA::Log::PrintToTextFile(const char* File, const char* Function, int LineNumber, const char* LogCategory, Verbosity::Type VerbosityLevel, DetailLevel::Type Detail, const char* Format, va_list Args)
 {
 	// If an OutputLogs folder does not exist, create one.
 	DWORD filetype = GetFileAttributes(L"OutputLogs");
@@ -201,9 +218,9 @@ void Log::PrintToTextFile(const char* File, const char* Function, int LineNumber
 		}
 
 		// Print out the verbosity level.
-		if (VerbosityLevel == Verbosity::Default)
+		if (VerbosityLevel == Verbosity::Info)
 		{
-			fout << "DEFAULT: ";
+			fout << "INFO: ";
 		}
 		else if (VerbosityLevel == Verbosity::Debug)
 		{
@@ -227,7 +244,7 @@ void Log::PrintToTextFile(const char* File, const char* Function, int LineNumber
 	}
 }
 
-void Log::HandleFatalError()
+void DA::Log::HandleFatalError()
 {
 	if (Log::IsDebuggerAttached() == true)
 	{
@@ -239,7 +256,7 @@ void Log::HandleFatalError()
 	}
 }
 
-void Log::PrintTimeStampToConsoleWindow()
+void DA::Log::PrintTimeStampToConsoleWindow()
 {
 	time_t now = time(0);
 	tm timeInfo;
@@ -247,7 +264,7 @@ void Log::PrintTimeStampToConsoleWindow()
 	printf("[%d.%02d.%02d-%02d:%02d:%02d] ", timeInfo.tm_year + 1900, timeInfo.tm_mon + 1, timeInfo.tm_mday, timeInfo.tm_hour, timeInfo.tm_min, timeInfo.tm_sec);
 }
 
-void Log::PrintTimeStampToOutputWindow()
+void DA::Log::PrintTimeStampToOutputWindow()
 {
 	time_t now = time(0);
 	tm timeInfo;
@@ -259,7 +276,7 @@ void Log::PrintTimeStampToOutputWindow()
 	OutputDebugStringW(wc);
 }
 
-void Log::PrintTimeStampToTextFile(std::ofstream& OutStream)
+void DA::Log::PrintTimeStampToTextFile(std::ofstream& OutStream)
 {
 	time_t now = time(0);
 	tm timeInfo;
@@ -269,7 +286,7 @@ void Log::PrintTimeStampToTextFile(std::ofstream& OutStream)
 	OutStream << timeStampBuffer;
 }
 
-void Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)
+void DA::Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)
 {
 	switch (InLevel)
 	{
@@ -289,7 +306,7 @@ void Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)
 		// Set the color to red.
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 		break;
-	case Verbosity::Default:
+	case Verbosity::Info:
 		// Intended fallthrough.
 	default:
 		// Default it to a white color.
@@ -298,13 +315,18 @@ void Log::SetTextColorToVerbosityLevel(Verbosity::Type InLevel)
 	}
 }
 
-void Log::ResetTextColor()
+void DA::Log::ResetTextColor()
 {
 	// Set the color to white.
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
 
-const bool Log::IsDebuggerAttached()
+const bool DA::Log::IsDebuggerAttached()
 {
 	return (IsDebuggerPresent() != 0);
+}
+
+const bool DA::Log::DoesLogCategoryExist(const char* Category) const
+{
+	return (Category && mLogCategories.find(std::string(Category)) != mLogCategories.end()) ? true : false;
 }
