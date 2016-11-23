@@ -4,7 +4,7 @@ Trello Feature Board: https://trello.com/b/pO2yKzYp/log
 
 Log is a lightweight logging system designed around ease of use and functionality. 
 
-This project was built and includes project files for Visual Studio 2015. Build to run on a Windows, 64 bit platform. Windows 32-bit and 64-bit executables of the project are included in zip files.
+This project was built and includes project files for Visual Studio 2015. It was built to run only on Windows, 64 bit platform for now.
 
 To use the system:
 
