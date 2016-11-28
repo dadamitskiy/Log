@@ -1,0 +1,9 @@
+version: 1.7.{build}
+
+os: Visual Studio 2015
+
+platform:
+  - x64
+
+build_script:
+  - cmd: mkdir build && cd build && cmake .. && cmake --build . --config Debug && cmake --build . --config Release
