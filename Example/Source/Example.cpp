@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-2016 Daniel Adamitskiy
+ * Copyright © Daniel Adamitskiy. All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,16 +22,20 @@
  * THE SOFTWARE.
  */
 
-#include "Log.h"
+#include <Log.h>
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-int main(int, const char*[])
+// Declare several categories.
+DA_LOG_CATEGORY(OutWin, OutputWindow, Medium, All);
+DA_LOG_CATEGORY(ConWinCat, ConsoleWindow, Low, All);
+DA_LOG_CATEGORY(MyTxtFileCategory, TextFile, High, All);
+DA_LOG_CATEGORY(MyAllCategory, All, Low, All);
+
+int main(int argc, char* argv[])
 {
-	// Declare a few log categories.
-	DA_DECLARE_LOG_CATEGORY(OutWin, OutputWindow, Medium);
-	DA_DECLARE_LOG_CATEGORY(ConWinCat, ConsoleWindow, Low);
-	DA_DECLARE_LOG_CATEGORY(MyTxtFileCategory, TextFile, High);
-	DA_DECLARE_LOG_CATEGORY(MyAllCategory, All, Low);
+	// Uncommenting the following/utilizing a fatal log with result in halting program execution
+	// DA_LOG(OutWin, Fatal, "This type of log causes a break");
 
 	// Test out logging to the output window.
 	DA_LOG(OutWin, Debug, "Test Message for the output window.");
@@ -57,6 +61,5 @@ int main(int, const char*[])
 	DA_LOG(MyAllCategory, Info, "Hey look, I'm just a normal message.");
 	DA_LOG(MyAllCategory, Error, "This would log some error.");
 
-	system("PAUSE");
 	return 0;
 }
