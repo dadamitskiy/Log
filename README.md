@@ -2,14 +2,11 @@
 
 Trello Feature Board: https://trello.com/b/pO2yKzYp/log 
 
-Log is a lightweight logging system designed around ease of use and functionality. 
-
-This project was built and includes project files for Visual Studio 2015. It was built to run only on Windows, 64 bit platform for now.
+Log is a logging system designed for ease of use and functionality.
 
 To use the system:
 
-1. Include Log.h in your file.
-2. Use DA_DECLARE_LOG_CATEGORY() to declare a specific log category that contains unique attributes to it.
-3. Use DA_LOG() in code to log whatever information your program requires. 
+1. Declare a log category with DA_LOG_CATEGORY().
+2. Log info to that category with DA_LOG(). 
 
-See ExampleUsage.cpp for a demonstration of using the system.
+See Example.cpp for a demonstration of system use.
