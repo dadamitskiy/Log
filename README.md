@@ -1,4 +1,4 @@
-# Log – Version 1.7
+# Log [![Build status](https://ci.appveyor.com/api/projects/status/a7an0bfjnrety6jc?svg=true)](https://ci.appveyor.com/project/dadamitskiy/log)
 
 Trello Feature Board: https://trello.com/b/pO2yKzYp/log 
 
