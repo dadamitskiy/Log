@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright © Daniel Adamitskiy. All Rights Reserved.
+ * Copyright Â© Daniel Adamitskiy. All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 #define DA_LOG_CATEGORY(categoryName, outputType, detail, inConfig)																			\
 	extern struct LogCategory##categoryName : public DA::Log::LogCategory																	\
 	{																																		\
-		explicit FORCEINLINE LogCategory##categoryName()																					\
+		explicit DA_FORCEINLINE LogCategory##categoryName()																					\
 			: LogCategory(#categoryName, DA::Log::OutputMethod::outputType, DA::Log::DetailLevel::detail, DA::Log::BuildConfig::inConfig)	\
 		{																																	\
 		}																																	\
